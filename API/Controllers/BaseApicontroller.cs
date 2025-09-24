@@ -1,0 +1,26 @@
+using System;
+using API.RequestHelpers;
+using Core.Entities;
+using Core.Interfaces;
+using Core.Specification;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
+
+namespace API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class BaseApicontroller : ControllerBase
+{
+    [HttpGet]
+    public async Task<ActionResult> CreatedPagedResult<T>(IGenericRepository<T> repo,
+        ISpecification<T> spec, int pageIndex, int pageSize) where T : BaseEntity
+    {
+        var items = await repo.ListAsync(spec);
+        var count = await repo.CountAsync(spec);
+
+        var pagination = new Pagination<T>(pageIndex, pageSize, count, items);
+
+        return Ok(pagination);
+    }
+}
